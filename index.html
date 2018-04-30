@@ -285,6 +285,198 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://leeliyan.xyz/2018/04/30/build-navigation-app-from-0-to-100/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liyan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="leeliyan.xyz">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/30/build-navigation-app-from-0-to-100/" itemprop="url">
+                  从0到100，打造一款导航软件
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+                
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-30T17:28:13+08:00">2018-04-30</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/30/build-navigation-app-from-0-to-100/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/30/build-navigation-app-from-0-to-100/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>从2016年11月开始，我接受了自研滴滴内置导航的任务，到今天，历时一年零四个月。最初的目标，是替换当时使用的腾讯SOSO地图内置导航，实现滴滴地图整个产品线的闭环。<br>当时把这个任务交给我的时候，是机遇，也是挑战。说实话之前我是没有导航语音播报的相关经验的，仅有的后台服务的经验是在高德做公交引擎。除了缺乏经验，时间也比较紧，自上而下都有比较大的压力（自研导航上线是地图这边的一个关键KPI）。<br>今天，回头看看这款产品的研发结果，还是取得了预期的效果。内置SDK全面替换为自研SDK，司机口碑上升，NPS上升，内置导航使用率上升。调用自研的导航诱导服务，整个过程中没有出现大的问题。没有出现过导航服务整体不可用的事故。在研发过程中，原有司机端一些隐藏比较深的BUG，都得到了系统的梳理和解决。比如客户端GPS点延迟，语音TTS延时等，在自建导航之前问题暴漏的不明显，自建后，投入了更多的人力，自然也有更高的要求，去发现问题。<br>总结一下自己的几点心得体会。</p>
+<h1 id="研发的开始阶段，速度优先，quick-and-dirty"><a href="#研发的开始阶段，速度优先，quick-and-dirty" class="headerlink" title="研发的开始阶段，速度优先，quick and dirty"></a>研发的开始阶段，速度优先，quick and dirty</h1><p>互联网是一个充分竞争的领域，在一个产品从零到一的阶段，速度就是生命，赶在竞争对手前推出一款产品，或是在对手推出一款产品后，迅速的追上，直接决定了这款产品，甚至是一家创业团队是否能够生存。具体速度优先的tips包括：</p>
+<h2 id="不要求一个完美实现的方案，要求一个稳定实用的方案。"><a href="#不要求一个完美实现的方案，要求一个稳定实用的方案。" class="headerlink" title="不要求一个完美实现的方案，要求一个稳定实用的方案。"></a>不要求一个完美实现的方案，要求一个稳定实用的方案。</h2><p>即使带有明显缺陷，也是可以上线的，开发人员或者产品经理要有ownership的精神，不是唯唯诺诺惟上是从，也不是小心翼翼瞻前顾后不敢做决定，而是能够以产品owner的身份，为产品负责，为用户负责，权衡利弊，挺身而出。比如滴滴早期的派单引擎，采用直线距离做为派单权值，显然对跨河、封闭道路等情形，会有明显的bad case。但是，如果当时的产品技术人员如果决策把这些bug修复了再上线，那市场早就被当年的竞争对手占领，也就没有今天的滴滴了。<br>在滴滴的派单引擎中，直线距离直到今天仍然在发挥着作用，在请求地图的路线规划服务失败时，仍然会兜底采用。如同吴军老师在《数学之美》这本书中，<a href="https://blog.csdn.net/whiterbear/article/details/45312793" target="_blank" rel="noopener">介绍谷歌AK-47的设计者那样</a>，好的方案，能够迅速解决80%的头部问题，而且非常易于Debug。</p>
+<h2 id="系统设计要有前瞻性"><a href="#系统设计要有前瞻性" class="headerlink" title="系统设计要有前瞻性"></a>系统设计要有前瞻性</h2><p>虽然产品实现上，基于速度的考虑，不可能一开始就尽善尽美，但是架构的设计在产品从0到1的阶段却是必不可少的，架构设计是一款产品的设计图纸，图纸画错了，再精良的施工做出来的也是废品。并且，由于互联网的创新本质，产品经理更倾向于把拿不准的方案多做几套，放到线上去做A/B Test，通过用户数据来做决策。这样，对工程师的架构设计更是一种考验。</p>
+<p>架构设计要分层，把最容易变更的策略部分和基础的数据分开，金字塔模型，越往下的模块越要求稳定性，少变更，越往上的部分越灵活。<br>拿导航服务为例，底层的数据模块，要求高性能，低变更，内存自己管理，采用了C + STL的方式，用linux的系统调用函数mmap批量申请内存，自己设计内存分布；中间的导航策略模块，包含了非常多的播报策略，如预告轮，轮播，动作轮等等，适合采用设计模式这样的东西提高开发效率和代码复用率，我们采用了C++，良好的面向对象设计，以应对产品复杂多变的需求；最上层接入模块，针对PM需求比较频繁，而且会有一些实验性质的策略，比较适合采用python,node.js,golang这样的现代语言开发，以应对频繁更改的需求，提高开发效率。<br><img src="/2018/04/30/build-navigation-app-from-0-to-100/appstruct.png" title="服务架构"></p>
+<h2 id="基于数据分析的软件开发"><a href="#基于数据分析的软件开发" class="headerlink" title="基于数据分析的软件开发"></a>基于数据分析的软件开发</h2><p>一般认为，产品经理PM是产品owner，对最终的产品质量负责，并调动开发（RD），质量测试（QA）,数据分析（BI）等资源，推动一款产品的上线升级。RD在整个产品发布流程中的角色是开发，是make things，传统上不会对数据分析的事情负责。</p>
+<p>实践中，数据分析却变成了经常发生问题的环境，埋点数据经常不可用，导致PM拿到的分析结果是错误的。由此导致了一系列问题：BI的同学觉得自己的工作没有成就感，变成了“提数工具”，RD同学觉得增加了自己额外的工作量，埋点不是在make things，而是在为他们的工作增加负担，PM同学忙于两头协调，疲于奔命，不能把精力用于思考产品，而是在处理各种琐事。大家都相当的不happy。</p>
+<p>解决这个问题的核心在于大家需要提高对埋点重要性的认识，Leader要有这个意识，埋点是和项目开发同样重要的TODO项。要从RD身上找突破口，首先，埋点、记日志不是在给RD找额外工作量，而是工作的一部分。现代的互联网产品，在设计之初就需要考虑统计的问题，在计算工作量时也要把埋点、打日志的工作量记录在内。<br>如何记录好日志也是一门学问，RD要以“方便统计”为目的来记日志，日志格式输出标准化，要以能直接进入hive库，给BI查询为标准。比如，实践中发现，RD打错误日志的时候，分为error_code,和error_message两个字段，error_message除了详细解释了错误的原因，竟然还把错误case相关数据的ID也打在日志里，这就会导致统计中做group by非常困难，是要避免的。</p>
+<h2 id="TraceID在微服务架构中的关键作用"><a href="#TraceID在微服务架构中的关键作用" class="headerlink" title="TraceID在微服务架构中的关键作用"></a>TraceID在微服务架构中的关键作用</h2><p>另外一个技巧就是TraceID的应用，别小瞧了TraceID，很多开发者都忽视，甚至有误解的地方，<a href="https://bigbully.github.io/Dapper-translation/" target="_blank" rel="noopener">Google甚至搞了一套系统，专门用于查case</a>。目前互联网公司流行的微服务的架构设计，主要目的在于隔离频繁上线变更服务带来的影响，以及便于快速迭代，应对用户群指数增长的需求，但由此带来的问题是，服务产生的bad case追查流程比较困难，有些bad case甚至不是由于单一的某个模块产生的，而是跨几个模块的corner case，单个去看每个模块，似乎都没有什么错误，但是串联在一起，却产生了bad case。这就需要在产品上线之初就设计一套traceID机制，把客户端产生的一次session会话串起来。</p>
+<p>每个模块，从客户端开始，都要需要打印具有相同语义的trace日志，格式如下：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>timestamp</td>
+<td>server端收到日志的时间</td>
+</tr>
+<tr>
+<td>parentID</td>
+<td>上游传入的traceID中的childID</td>
+</tr>
+<tr>
+<td>childID</td>
+<td>传给下游的parentID</td>
+</tr>
+<tr>
+<td>cost</td>
+<td>整个request的响应时间</td>
+</tr>
+</tbody>
+</table>
+<p>这样，相当于对整个调用链，像一个链表一样串了起来，还能够复杂的表示并行处理这样的会话请求，例如<br><img src="/2018/04/30/build-navigation-app-from-0-to-100/traceid.png"><br>图片来源:<a href="https://bigbully.github.io/Dapper-translation/" target="_blank" rel="noopener">https://bigbully.github.io/Dapper-translation/</a></p>
+<h1 id="放量后，精益求精"><a href="#放量后，精益求精" class="headerlink" title="放量后，精益求精"></a>放量后，精益求精</h1><h2 id="均值和方差"><a href="#均值和方差" class="headerlink" title="均值和方差"></a>均值和方差</h2><p>放量后，需要关注用户体验，精益求精，用老大的话讲，要关注均值，更要关注方差。<br>通俗的讲，关注均值，就是关注某次模型优化，某次策略升级带来的系统性收益，比如平均车速提高了多少，偏航率降低了多少。关注方差，是指要关注极端的bad case，在放量后，这些bad case会随着放量的增加，逐步通过各种渠道汇总到开发团队。有时候甚至像潮水一样猝不及防。<br>作为产品方讲，均值的提升是有说服力的，大数据时代靠数据说话，谁也无法否认数据。但总是盯着均值，不关注方差，是错误的。对bad case的分析是非常重要的，一个反馈给RD的bad case背后，类似的问题可能已经发生了千百万次。总之，bad case解了，方差会降低，均值会提高，而针对均值的优化，却不一定解决bad case。</p>
+<p>但是需要避免的是陷入解bad case的困境中，避免钻死胡同，要能站在系统的角度看问题，确保每次优化，每次上线都是朝着系统最优的方向前进。</p>
+<h2 id="导航code"><a href="#导航code" class="headerlink" title="导航code"></a>导航code</h2><p>例如，导航服务中的一个难点是识别路口转向播报，由于真实世界道路形态的复杂性，用抽象语言去描述真实的复杂路况需要考虑非常多的因素，例如实际工作中，我们表示一个右转的播报有13种形态。需要考虑道路线型，道路等级，相似道路，顺行道路等诸多方面。一个常见的问题，就是用规则描述的路口形态决策树，很容易出现bad case。<br><img src="/2018/04/30/build-navigation-app-from-0-to-100/arrows.png" title="so many arrows!"></p>
+<p>我们的想法是为全国1.4亿个路口转向建立一个数据库。数据库为每个转型code都建立了一个专属的模型，模型有23个维度。 </p>
+<img src="/2018/04/30/build-navigation-app-from-0-to-100/tool.png">
+<p>对整个路口code的识别策略，都会基于1.4亿个code做自动评价，对diff的部分进行人工抽样。保障每次改动是正向的，人工评测的结果，会记录到数据库中，用于积累真值样本。<br><img src="/2018/04/30/build-navigation-app-from-0-to-100/evaluation.png"></p>
+<p>在解决了code的问题后，更复杂的问题出现了，那就是语音播报的合理性，code是单点的，可穷举的，播报却是和路线相关的，不可穷举的。</p>
+<h2 id="导航语音播报"><a href="#导航语音播报" class="headerlink" title="导航语音播报"></a>导航语音播报</h2><p>一个思路是采用用户的实际轨迹，去评估语言播报的合理性。需要系统性的思考一个问题，用户为什么没有按照我们给的路线走？真实的情况是怎么样的？<br>首先，和解决code的思路类似，要对复杂路段进行用户画像的工作。比如，实际工作中，我们发现在北京的路测效果比较好，换了一个城市，比如有着“魔幻8D城市”的重庆，针对北京道路形态进行的播报规则优化，就不适用了。<br>那么，重庆的道路形态又是怎么样的呢？<br>重庆是山城，立交桥多，隧道多，历史悠久，人口稠密，小路多，出入口，分歧点距离近。城市规划不像北京那样规整。<br>那么我们怎么应对呢？</p>
+<blockquote>
+<p>路测，消除不真实感<br>看竞品怎么播报，竞品比我们提前做了10多年，有历史积累<br>看用户轨迹，但是是有策略的看，筛选的条件是：对周边路况不熟悉的用户，新手司机，甚至是疲劳驾驶的司机。<br>对特殊地段进行特殊标注，比如重庆一些特殊的立交桥，交通量很大，道路设计很特别，是值得做专门优化的</p>
+</blockquote>
+<h1 id="写在最后的总结"><a href="#写在最后的总结" class="headerlink" title="写在最后的总结"></a>写在最后的总结</h1><p>做为一款工具产品，在滴滴的所有服务中，“快”一直是最被看重的因素，分单要快，接驾要快，算路要快，用的时候召之即来，用完了挥之即去。<br>唯独对于导航服务，对于司机而言，每天10个小时的工作，伴随始终。对我们的专职司机而言，自驾不是追求自由与便利的娱乐，是他们谋生手段，对导航可靠性的要求，远超自驾对导航的期待。<br>即使在偏布立交桥、隧道的重庆，GPS不再可靠，我们也仍然要想办法为司机提供一个高可用的导航软件，就像老板要求的，没有什么不可能，对技术的追求是无止境的。这是司机选择我们，对我们的信任，也是我们义不容辞的使命。</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://leeliyan.xyz/2018/02/22/importance-of-engineering/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -651,7 +843,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-count">3</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -659,6 +851,19 @@
 
               
 
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
               
             </nav>
           
